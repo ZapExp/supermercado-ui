@@ -1,7 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
-import { CommonModule } from '@angular/common'; // Import CommonModule for *ngIf, async pipe etc.
+import { CommonModule } from '@angular/common';
+import { AuthStateService } from './services/auth-state.service';
 
 @Component({
   selector: 'app-root',
@@ -9,26 +9,18 @@ import { CommonModule } from '@angular/common'; // Import CommonModule for *ngIf
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'supermercado-ui';
+  private readonly auth = inject(AuthStateService);
 
-  private readonly oidcSecurityService = inject(OidcSecurityService);
-
-  ngOnInit() {
-    this.oidcSecurityService
-      .checkAuth()
-      .subscribe(({ isAuthenticated, userData }) =>
-        console.log({ isAuthenticated })
-      );
-  }
+  userData = this.auth.userData;
+  isAuthenticated = this.auth.isAuthenticated;
 
   login() {
-    this.oidcSecurityService.authorize();
+    this.auth.login();
   }
 
   logout() {
-    this.oidcSecurityService
-      .logoff()
-      .subscribe((result) => console.log(result));
+    this.auth.logout();
   }
 }
