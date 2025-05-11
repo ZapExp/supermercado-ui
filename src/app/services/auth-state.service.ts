@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
-import { UserData } from '../types/types';
+import { UserData } from '../utils/types';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +24,6 @@ export class AuthStateService {
 
         const data = userData as UserData;
         this.userData.set(data);
-        console.log({ isAuthenticated, userData });
       });
   }
 

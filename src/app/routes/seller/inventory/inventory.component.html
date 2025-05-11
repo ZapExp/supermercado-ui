@@ -1,0 +1,33 @@
+<h1 class="text-3xl">Gestión de inventario</h1>
+<div class="divider"></div>
+
+<div
+  class="overflow-x-auto"
+  *ngIf="products$ | async as products; else noDataState"
+>
+  <table class="table">
+    <!-- head -->
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>Cantidad en Stock</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products">
+        <th>{{ product.id }}</th>
+        <th>{{ product.name }}</th>
+        <th>{{ product.description }}</th>
+        <th>{{ product.price }}</th>
+        <th>{{ product.stock }}</th>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #noDataState>
+  <p>Cargando, por favor espere...</p>
+</ng-template>

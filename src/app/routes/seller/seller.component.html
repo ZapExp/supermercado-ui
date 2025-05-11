@@ -1,0 +1,26 @@
+<div class="flex">
+  <ul class="menu rounded-box w-60 sticky">
+    <li class="menu-title">Menú de Navegación</li>
+    <li routerLinkActive="bg-neutral text-neutral-content rounded-lg">
+      <a [routerLink]="'/seller/sell'">Registrar Venta</a>
+    </li>
+    <li routerLinkActive="bg-neutral text-neutral-content rounded-lg">
+      <a [routerLink]="'/seller/inventory'">Inventario</a>
+    </li>
+    <li routerLinkActive="bg-neutral text-neutral-content rounded-lg">
+      <a [routerLink]="'/seller/report'">Reporte</a>
+    </li>
+    <li routerLinkActive="bg-neutral text-neutral-content rounded-lg">
+      <a [routerLink]="'/seller/suppliers'">Proveedores</a>
+    </li>
+    <li routerLinkActive="bg-neutral text-neutral-content rounded-lg">
+      <a [routerLink]="'/seller/promotions'">Promociones</a>
+    </li>
+    <li routerLinkActive="bg-neutral text-neutral-content rounded-lg">
+      <a [routerLink]="'/seller/social'">Red Social</a>
+    </li>
+  </ul>
+  <div class="p-4 pt-8 w-full">
+    <router-outlet></router-outlet>
+  </div>
+</div>
