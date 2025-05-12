@@ -1,33 +1,64 @@
 <h1 class="text-3xl">Gestión de inventario</h1>
 <div class="divider"></div>
 
-<div
-  class="overflow-x-auto"
-  *ngIf="products$ | async as products; else noDataState"
->
-  <table class="table">
-    <!-- head -->
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Precio</th>
-        <th>Cantidad en Stock</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let product of products">
-        <th>{{ product.id }}</th>
-        <th>{{ product.name }}</th>
-        <th>{{ product.description }}</th>
-        <th>{{ product.price }}</th>
-        <th>{{ product.stock }}</th>
-      </tr>
-    </tbody>
-  </table>
-</div>
+<div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-1">
+    <div>Buscar por nombre</div>
+    <label class="input">
+      <svg
+        class="h-[1em] opacity-50"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+      >
+        <g
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          stroke-width="2.5"
+          fill="none"
+          stroke="currentColor"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </g>
+      </svg>
+      <input
+        type="text"
+        class="grow text-base w-full"
+        placeholder="..."
+        [(ngModel)]="searchText"
+      />
+    </label>
+  </div>
 
-<ng-template #noDataState>
-  <p>Cargando, por favor espere...</p>
-</ng-template>
+  <div
+    class="overflow-x-auto"
+    *ngIf="products$ | async as products; else noDataState"
+  >
+    <h2 class="text-2xl">Lista de productos</h2>
+    <div class="divider my-2"></div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Cantidad en Stock</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of products">
+          <th>{{ product.id }}</th>
+          <th>{{ product.name }}</th>
+          <th>{{ product.description }}</th>
+          <th>{{ product.price }}</th>
+          <th>{{ product.stock }}</th>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #noDataState>
+    <p>Cargando, por favor espere...</p>
+  </ng-template>
+</div>

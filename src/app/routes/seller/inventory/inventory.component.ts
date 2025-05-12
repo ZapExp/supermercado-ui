@@ -1,14 +1,28 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, model, OnInit, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import type { Product, ProductRaw } from '../../../utils/types';
-import { catchError, finalize, map, Observable, of, tap } from 'rxjs';
+import {
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  finalize,
+  map,
+  Observable,
+  of,
+  startWith,
+  tap,
+} from 'rxjs';
 import { processProduct } from '../../../utils/processData';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-inventory',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.css',
 })
@@ -17,33 +31,51 @@ export class InventoryComponent implements OnInit {
   private apiUrl = environment.apiUrl;
 
   public isLoading = false;
-  public errorMessage: string | null = null;
+  public errorMessage = signal<string | null>(null);
   public products$!: Observable<Product[]>;
 
+  public searchText = model<string>('');
+  private searchText$ = toObservable(this.searchText).pipe(
+    debounceTime(300), // Wait 300ms after the user stops typing
+    distinctUntilChanged(), // Only emit if the value actually changed
+    startWith(this.searchText()) // Emit the initial value immediately
+  );
+
   ngOnInit(): void {
-    this.products$ = this.fetchProducts();
+    this.products$ = this.setupProductFilter();
   }
 
-  fetchProducts(): Observable<Product[]> {
+  setupProductFilter(): Observable<Product[]> {
     this.isLoading = true;
-    this.errorMessage = null;
+    this.errorMessage.set(null);
 
-    return this.http.get(`${this.apiUrl}/producto`).pipe(
+    const productsUnfiltered$ = this.http.get(`${this.apiUrl}/producto`).pipe(
       map((response) => {
         if (response) {
           const productsRaw = response as ProductRaw[];
           return productsRaw.map(processProduct);
         }
-        return []; // Return empty if data is not as expected
+        return [];
       }),
       catchError((error) => {
-        // 5. Operator 3: Error Handling
         console.error('API Error:', error);
-        this.errorMessage = 'Failed to fetch data. Please try again.';
+        this.errorMessage.set('Failed to fetch data. Please try again.');
         return of([]);
       }),
       finalize(() => {
         this.isLoading = false;
+      })
+    );
+
+    return combineLatest([productsUnfiltered$, this.searchText$]).pipe(
+      map(([products, search]) => {
+        if (!search) {
+          return products;
+        }
+        const lowerCaseSearch = search.toLowerCase();
+        return products.filter((product) =>
+          product.name.toLowerCase().includes(lowerCaseSearch)
+        );
       })
     );
   }
