@@ -1,5 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, inject, model, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  model,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import type { Product, ProductRaw } from '../../../utils/types';
 import {
@@ -19,10 +26,12 @@ import { processProduct } from '../../../utils/processData';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { ConfirmationDialogComponent } from '../../../components/confirmation-dialog/confirmation-dialog.component';
+import type { ConfirmationResult } from '../../../utils/types';
 
 @Component({
   selector: 'app-inventory',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmationDialogComponent],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.css',
 })
@@ -40,6 +49,9 @@ export class InventoryComponent implements OnInit {
     distinctUntilChanged(), // Only emit if the value actually changed
     startWith(this.searchText()) // Emit the initial value immediately
   );
+
+  @ViewChild(ConfirmationDialogComponent)
+  dialog!: ConfirmationDialogComponent<number>;
 
   ngOnInit(): void {
     this.products$ = this.setupProductFilter();
@@ -78,5 +90,23 @@ export class InventoryComponent implements OnInit {
         );
       })
     );
+  }
+
+  openDeleteConfirmation(id: number, name: string): void {
+    const message = `¿Estas seguro de que deseas eliminar "${name}" con id ${id}`;
+    this.dialog.message = message;
+    this.dialog.title = `Confirmar la eliminación de ${name}`;
+    this.dialog.confirmButtonText = 'Eliminar';
+    // Pass the specific item object as data
+    this.dialog.open(id);
+  }
+
+  handleDeleteConfirmation({
+    confirmed,
+    data,
+  }: ConfirmationResult<number>): void {
+    if (!confirmed) {
+      return;
+    }
   }
 }

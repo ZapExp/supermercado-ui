@@ -1,0 +1,23 @@
+<!-- Use ViewChild reference #confirmationDialog -->
+<dialog #confirmationDialog class="modal" (close)="onDialogClose()">
+  <div class="modal-box">
+    <h3 class="text-lg font-bold">{{ title }}</h3>
+
+    <p class="py-4">{{ message }}</p>
+
+    <div class="modal-action">
+      <form method="dialog" class="flex gap-2 justify-end w-full">
+        <button class="btn" (click)="onCancel()">
+          {{ cancelButtonText }}
+        </button>
+        <button class="btn btn-primary" (click)="onConfirm()">
+          {{ confirmButtonText }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button>Cerrar</button>
+  </form>
+</dialog>

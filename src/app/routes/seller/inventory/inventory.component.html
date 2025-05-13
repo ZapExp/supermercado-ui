@@ -44,15 +44,27 @@
           <th>Descripción</th>
           <th>Precio</th>
           <th>Cantidad en Stock</th>
+          <th>Acción</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let product of products">
+        <tr *ngFor="let product of products" class="hover:bg-base-300">
           <th>{{ product.id }}</th>
           <th>{{ product.name }}</th>
           <th>{{ product.description }}</th>
           <th>{{ product.price }}</th>
-          <th>{{ product.stock }}</th>
+          <th [class.text-error]="product.stock < 5">{{ product.stock }}</th>
+          <th>
+            <div class="flex gap-2">
+              <button class="btn btn-warning">Editar</button>
+              <button
+                class="btn btn-error"
+                (click)="openDeleteConfirmation(product.id, product.name)"
+              >
+                Eliminar
+              </button>
+            </div>
+          </th>
         </tr>
       </tbody>
     </table>
@@ -62,3 +74,6 @@
     <p>Cargando, por favor espere...</p>
   </ng-template>
 </div>
+
+<app-confirmation-dialog (confirmed)="handleDeleteConfirmation($event)">
+</app-confirmation-dialog>

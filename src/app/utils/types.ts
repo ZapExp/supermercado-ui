@@ -22,3 +22,8 @@ export interface Product {
   stock: number;
   category_id: number;
 }
+
+export interface ConfirmationResult<T> {
+  confirmed: boolean;
+  data: T | null;
+}
