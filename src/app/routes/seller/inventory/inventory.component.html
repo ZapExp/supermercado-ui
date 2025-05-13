@@ -1,10 +1,76 @@
 <h1 class="text-3xl">Gestión de inventario</h1>
 <div class="divider"></div>
 
+<div class="my-4">
+  <div *ngIf="isLoading() && !isDeleting()" class="alert alert-info shadow-lg">
+    <div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="stroke-current shrink-0 w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <span>Cargando lista de productos, por favor espere...</span>
+    </div>
+  </div>
+
+  <div *ngIf="isDeleting()" class="alert alert-warning shadow-lg">
+    <div>
+      <span class="loading loading-spinner text-warning"></span>
+      <span>Eliminando producto...</span>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage()" class="alert alert-error shadow-lg mt-2">
+    <div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span>Error: {{ errorMessage() }}</span>
+    </div>
+  </div>
+
+  <div *ngIf="successMessage()" class="alert alert-success shadow-lg mt-2">
+    <div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span>{{ successMessage() }}</span>
+    </div>
+  </div>
+</div>
+
 <div class="flex flex-col gap-4">
   <div class="flex flex-col gap-1">
     <div>Buscar por nombre</div>
-    <label class="input">
+    <label class="input input-bordered flex items-center gap-2">
       <svg
         class="h-[1em] opacity-50"
         xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +90,7 @@
       <input
         type="text"
         class="grow text-base w-full"
-        placeholder="..."
+        placeholder="Filtrar productos..."
         [(ngModel)]="searchText"
       />
     </label>
@@ -32,48 +98,77 @@
 
   <div
     class="overflow-x-auto"
-    *ngIf="products$ | async as products; else noDataState"
+    *ngIf="products$ | async as products; else noDataOrLoadingState"
   >
-    <h2 class="text-2xl">Lista de productos</h2>
-    <div class="divider my-2"></div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Precio</th>
-          <th>Cantidad en Stock</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let product of products" class="hover:bg-base-300">
-          <th>{{ product.id }}</th>
-          <th>{{ product.name }}</th>
-          <th>{{ product.description }}</th>
-          <th>{{ product.price }}</th>
-          <th [class.text-error]="product.stock < 5">{{ product.stock }}</th>
-          <th>
-            <div class="flex gap-2">
-              <button class="btn btn-warning">Editar</button>
-              <button
-                class="btn btn-error"
-                (click)="openDeleteConfirmation(product.id, product.name)"
-              >
-                Eliminar
-              </button>
-            </div>
-          </th>
-        </tr>
-      </tbody>
-    </table>
+    <div *ngIf="products.length > 0; else noProductsFoundAfterSearch">
+      <h2 class="text-2xl">Lista de productos</h2>
+      <div class="divider my-2"></div>
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Cantidad en Stock</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of products" class="hover:bg-base-300">
+            <th>{{ product.id }}</th>
+            <td>{{ product.name }}</td>
+
+            <td>{{ product.description }}</td>
+            <td>{{ product.price | currency : "USD" : "symbol" : "1.2-2" }}</td>
+
+            <td
+              [class.text-error]="product.stock < 5"
+              [class.font-bold]="product.stock < 5"
+            >
+              {{ product.stock }}
+            </td>
+            <td>
+              <div class="flex gap-2">
+                <button class="btn btn-sm btn-warning">Editar</button>
+                <button
+                  class="btn btn-sm btn-error"
+                  (click)="openDeleteConfirmation(product.id, product.name)"
+                  [disabled]="isDeleting()"
+                >
+                  <span
+                    *ngIf="isDeleting()"
+                    class="loading loading-spinner loading-xs"
+                  ></span>
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noProductsFoundAfterSearch>
+      <div *ngIf="!isLoading()" class="text-center py-8">
+        <p class="text-xl">
+          No se encontraron productos que coincidan con su búsqueda.
+        </p>
+      </div>
+    </ng-template>
   </div>
 
-  <ng-template #noDataState>
-    <p>Cargando, por favor espere...</p>
+  <ng-template #noDataOrLoadingState>
+    <!-- This ng-template is used if products$ hasn't emitted or is null/undefined.
+         The isLoading() check above will handle the initial "Cargando..." message.
+         If products is an empty array AFTER loading, the inner *ngIf="products.length > 0" will handle it.
+    -->
+    <div *ngIf="!isLoading() && !errorMessage()" class="text-center py-8">
+      <p class="text-xl">No hay productos para mostrar en este momento.</p>
+      <!-- You could add a button here to try reloading, etc. -->
+    </div>
   </ng-template>
 </div>
 
-<app-confirmation-dialog (confirmed)="handleDeleteConfirmation($event)">
-</app-confirmation-dialog>
+<app-confirmation-dialog
+  (confirmed)="handleDeleteConfirmation($event)"
+></app-confirmation-dialog>

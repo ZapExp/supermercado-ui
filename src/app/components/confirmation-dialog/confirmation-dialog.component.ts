@@ -6,6 +6,7 @@ import {
   ViewChild,
   ElementRef,
   ChangeDetectionStrategy,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { ConfirmationResult } from '../../utils/types';
@@ -19,10 +20,10 @@ import type { ConfirmationResult } from '../../utils/types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfirmationDialogComponent<T = number> {
-  @Input() message: string = '¿Estas seguro?';
-  @Input() confirmButtonText: string = 'Si, Confirmar';
-  @Input() cancelButtonText: string = 'Cancelar';
-  @Input() title: string = 'Confirmación Requerida';
+  public message = signal('¿Estas seguro?');
+  public confirmButtonText = signal('Si, Confirmar');
+  public cancelButtonText = signal('Cancelar');
+  public title = signal('Confirmación Requerida');
 
   @Output() confirmed = new EventEmitter<ConfirmationResult<T>>();
 

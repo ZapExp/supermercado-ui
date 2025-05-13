@@ -1,17 +1,17 @@
 <!-- Use ViewChild reference #confirmationDialog -->
 <dialog #confirmationDialog class="modal" (close)="onDialogClose()">
   <div class="modal-box">
-    <h3 class="text-lg font-bold">{{ title }}</h3>
+    <h3 class="text-lg font-bold">{{ title() }}</h3>
 
-    <p class="py-4">{{ message }}</p>
+    <p class="py-4">{{ message() }}</p>
 
     <div class="modal-action">
       <form method="dialog" class="flex gap-2 justify-end w-full">
         <button class="btn" (click)="onCancel()">
-          {{ cancelButtonText }}
+          {{ cancelButtonText() }}
         </button>
         <button class="btn btn-primary" (click)="onConfirm()">
-          {{ confirmButtonText }}
+          {{ confirmButtonText() }}
         </button>
       </form>
     </div>
