@@ -1,19 +1,18 @@
-// Предположим, что этот файл находится по пути: src/app/pages/seller/inventory/create-product/create-product.component.ts
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, model, OnInit, signal } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms'; // Import NgForm for template-driven form access
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { environment } from '../../../../../environments/environment'; // Adjust path
-import { catchError, finalize, tap, throwError, Observable, of } from 'rxjs';
-import { Category, Product } from '../../../../utils/types'; // Adjust path
+import { environment } from '../../../../../environments/environment';
+import { catchError, finalize, tap, throwError, of } from 'rxjs';
+import { Category, Product } from '../../../../utils/types';
 
 @Component({
   selector: 'app-create-product',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './create-product.component.html',
-  styleUrl: './create-product.component.css', // Create this empty file
+  styleUrl: './create-product.component.css',
 })
 export class CreateProductComponent implements OnInit {
   private http = inject(HttpClient);
@@ -43,7 +42,6 @@ export class CreateProductComponent implements OnInit {
   fetchCategories(): void {
     this.isFetchingCategories.set(true);
     this.categoriesError.set(null);
-    // Using /models/categoria to fetch categories for the dropdown
     this.http
       .get<Category[]>(`${this.apiUrl}/categoria`)
       .pipe(
@@ -60,8 +58,8 @@ export class CreateProductComponent implements OnInit {
           this.categoriesError.set(
             'Fallo al cargar las categorías. Inténtalo de nuevo.'
           );
-          this.categories.set([]); // Ensure categories list is empty on error
-          return of([]); // Return empty array to keep observable chain alive
+          this.categories.set([]);
+          return of([]);
         }),
         finalize(() => {
           this.isFetchingCategories.set(false);
@@ -71,12 +69,10 @@ export class CreateProductComponent implements OnInit {
   }
 
   submitForm(form: NgForm): void {
-    // Pass the form instance
     if (form.invalid) {
       this.errorMessage.set(
         'Por favor, completa todos los campos requeridos correctamente.'
       );
-      // Mark all fields as touched to show validation errors
       Object.values(form.controls).forEach((control) => {
         control.markAsTouched();
       });
