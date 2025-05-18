@@ -1,4 +1,4 @@
-<h1 class="text-3xl">Gestión de inventario</h1>
+<h1 class="text-3xl">Gestión de Categorías</h1>
 <div class="divider"></div>
 
 <div class="my-4">
@@ -17,14 +17,14 @@
           d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
         ></path>
       </svg>
-      <span>Cargando lista de productos, por favor espere...</span>
+      <span>Cargando lista de categorías, por favor espere...</span>
     </div>
   </div>
 
   <div *ngIf="isDeleting()" class="alert alert-warning shadow-lg">
     <div>
       <span class="loading loading-spinner text-warning"></span>
-      <span>Eliminando producto...</span>
+      <span>Eliminando categoría...</span>
     </div>
   </div>
 
@@ -47,6 +47,7 @@
     </div>
   </div>
 
+  <!-- Success Message -->
   <div *ngIf="successMessage()" class="alert alert-success shadow-lg mt-2">
     <div>
       <svg
@@ -91,61 +92,48 @@
         <input
           type="text"
           class="grow text-base w-full"
-          placeholder="Filtrar productos..."
+          placeholder="Filtrar categorías..."
           [(ngModel)]="searchText"
         />
       </label>
     </div>
     <a
-      [routerLink]="'/seller/inventory/create-product'"
+      [routerLink]="'/seller/category/create-category'"
       class="btn btn-success"
     >
-      Añadir nuevo producto
+      Añadir nueva categoría
     </a>
   </div>
 
   <div
     class="overflow-x-auto"
-    *ngIf="products$ | async as products; else noDataOrLoadingState"
+    *ngIf="categories$ | async as categories; else noDataOrLoadingState"
   >
-    <div *ngIf="products.length > 0; else noProductsFoundAfterSearch">
-      <h2 class="text-2xl">Lista de productos</h2>
+    <div *ngIf="categories.length > 0; else noCategoriesFoundAfterSearch">
+      <h2 class="text-2xl">Lista de categorías</h2>
       <div class="divider my-2"></div>
       <table class="table table-zebra">
         <thead>
           <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Precio</th>
-            <th>Cantidad en Stock</th>
             <th class="w-10">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let product of products" class="hover:bg-base-300">
-            <th>{{ product.id }}</th>
-            <td>{{ product.nombre }}</td>
-
-            <td>{{ product.descripcion }}</td>
-            <td>
-              {{ product.precio | currency : "COP" : "symbol" }}
-            </td>
-
-            <td
-              [class.text-error]="product.stock < 5"
-              [class.font-bold]="product.stock < 5"
-            >
-              {{ product.stock }}
-            </td>
+          <tr *ngFor="let category of categories" class="hover:bg-base-300">
+            <th>{{ category.id }}</th>
+            <td>{{ category.nombre }}</td>
             <td>
               <div class="flex gap-2">
-                <button class="btn btn-sm btn-warning">Editar</button>
+                <a
+                  [routerLink]="['/seller/categories/edit', category.id]"
+                  class="btn btn-sm btn-warning"
+                  >Editar</a
+                >
                 <button
                   class="btn btn-sm btn-error"
-                  (click)="
-                    openDeleteConfirmation(product.id || 0, product.nombre)
-                  "
+                  (click)="openDeleteConfirmation(category.id, category.nombre)"
                   [disabled]="isDeleting()"
                 >
                   <span
@@ -160,23 +148,28 @@
         </tbody>
       </table>
     </div>
-    <ng-template #noProductsFoundAfterSearch>
-      <div *ngIf="!isLoading()" class="text-center py-8">
+
+    <ng-template #noCategoriesFoundAfterSearch>
+      <div *ngIf="!isLoading() && searchText()" class="text-center py-8">
         <p class="text-xl">
-          No se encontraron productos que coincidan con su búsqueda.
+          No se encontraron categorías que coincidan con "{{ searchText() }}".
         </p>
       </div>
     </ng-template>
   </div>
 
   <ng-template #noDataOrLoadingState>
-    <!-- This ng-template is used if products$ hasn't emitted or is null/undefined.
-         The isLoading() check above will handle the initial "Cargando..." message.
-         If products is an empty array AFTER loading, the inner *ngIf="products.length > 0" will handle it.
-    -->
-    <div *ngIf="!isLoading() && !errorMessage()" class="text-center py-8">
-      <p class="text-xl">No hay productos para mostrar en este momento.</p>
-      <!-- You could add a button here to try reloading, etc. -->
+    <div
+      *ngIf="!isLoading() && !errorMessage() && !searchText()"
+      class="text-center py-8"
+    >
+      <p class="text-xl">No hay categorías para mostrar en este momento.</p>
+      <p class="mt-2">
+        Puedes
+        <a [routerLink]="'/seller/categories/create'" class="link link-primary"
+          >crear una nueva categoría</a
+        >.
+      </p>
     </div>
   </ng-template>
 </div>

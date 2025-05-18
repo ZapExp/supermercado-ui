@@ -1,0 +1,307 @@
+<div class="max-w-3xl mx-auto p-4">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-3xl font-semibold">Crear Nuevo Producto</h1>
+    <a
+      routerLink="/seller/inventory"
+      class="btn btn-ghost"
+      aria-label="Volver al inventario"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-5 h-5 mr-1"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+        />
+      </svg>
+      Volver al inventario
+    </a>
+  </div>
+  <div class="divider"></div>
+
+  <div class="my-4 space-y-2">
+    <div *ngIf="isLoading()" class="alert alert-info shadow-lg">
+      <div>
+        <span class="loading loading-spinner"></span>
+        <span>Creando producto, por favor espere...</span>
+      </div>
+    </div>
+    <div *ngIf="isFetchingCategories()" class="alert alert-info shadow-lg">
+      <div>
+        <span class="loading loading-spinner"></span>
+        <span>Cargando categorías...</span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage()" class="alert alert-error shadow-lg">
+      <div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>Error: {{ errorMessage() }}</span>
+      </div>
+    </div>
+    <div
+      *ngIf="categoriesError() && !isFetchingCategories()"
+      class="alert alert-warning shadow-lg"
+    >
+      <div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+        <span>Atención: {{ categoriesError() }}</span>
+        <button
+          *ngIf="!categoriesError()?.includes('No hay categorías disponibles')"
+          (click)="fetchCategories()"
+          class="btn btn-xs btn-outline ml-2"
+        >
+          Reintentar
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="successMessage()" class="alert alert-success shadow-lg">
+      <div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>{{ successMessage() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <form
+    #productForm="ngForm"
+    (ngSubmit)="submitForm(productForm)"
+    class="space-y-6 bg-base-200 p-6 rounded-lg shadow"
+  >
+    <!-- Product Name -->
+    <div class="form-control">
+      <label for="productName" class="label"
+        ><span class="label-text">Nombre del Producto</span></label
+      >
+      <input
+        id="productName"
+        name="productName"
+        type="text"
+        [(ngModel)]="productName"
+        required
+        minlength="3"
+        #nameCtrl="ngModel"
+        class="input input-bordered w-full"
+        [class.input-error]="nameCtrl.invalid && nameCtrl.touched"
+        placeholder="Ej: Laptop Gamer XYZ"
+      />
+      <div
+        *ngIf="nameCtrl.invalid && nameCtrl.touched"
+        class="label text-error text-xs"
+      >
+        <span *ngIf="nameCtrl.errors?.['required']"
+          >El nombre es requerido.</span
+        >
+        <span *ngIf="nameCtrl.errors?.['minlength']"
+          >El nombre debe tener al menos 3 caracteres.</span
+        >
+      </div>
+    </div>
+
+    <div class="form-control">
+      <label for="productDescription" class="label"
+        ><span class="label-text">Descripción</span></label
+      >
+      <textarea
+        id="productDescription"
+        name="productDescription"
+        [(ngModel)]="productDescription"
+        required
+        minlength="10"
+        #descCtrl="ngModel"
+        class="textarea textarea-bordered w-full h-24"
+        [class.textarea-error]="descCtrl.invalid && descCtrl.touched"
+        placeholder="Describe el producto detalladamente..."
+      ></textarea>
+      <div
+        *ngIf="descCtrl.invalid && descCtrl.touched"
+        class="label text-error text-xs"
+      >
+        <span *ngIf="descCtrl.errors?.['required']"
+          >La descripción es requerida.</span
+        >
+        <span *ngIf="descCtrl.errors?.['minlength']"
+          >La descripción debe tener al menos 10 caracteres.</span
+        >
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="form-control">
+        <label for="productPrice" class="label"
+          ><span class="label-text">Precio (USD)</span></label
+        >
+        <input
+          id="productPrice"
+          name="productPrice"
+          type="number"
+          [(ngModel)]="productPrice"
+          required
+          min="0.01"
+          step="0.01"
+          #priceCtrl="ngModel"
+          class="input input-bordered w-full"
+          [class.input-error]="priceCtrl.invalid && priceCtrl.touched"
+          placeholder="Ej: 299.99"
+        />
+        <div
+          *ngIf="priceCtrl.invalid && priceCtrl.touched"
+          class="label text-error text-xs"
+        >
+          <span *ngIf="priceCtrl.errors?.['required']"
+            >El precio es requerido.</span
+          >
+          <span *ngIf="priceCtrl.errors?.['min']"
+            >El precio debe ser positivo.</span
+          >
+        </div>
+      </div>
+
+      <div class="form-control">
+        <label for="productStock" class="label"
+          ><span class="label-text">Cantidad en Stock</span></label
+        >
+        <input
+          id="productStock"
+          name="productStock"
+          type="number"
+          [(ngModel)]="productStock"
+          required
+          min="0"
+          step="1"
+          #stockCtrl="ngModel"
+          class="input input-bordered w-full"
+          [class.input-error]="stockCtrl.invalid && stockCtrl.touched"
+          placeholder="Ej: 50"
+        />
+        <div
+          *ngIf="stockCtrl.invalid && stockCtrl.touched"
+          class="label text-error text-xs"
+        >
+          <span *ngIf="stockCtrl.errors?.['required']"
+            >El stock es requerido.</span
+          >
+          <span *ngIf="stockCtrl.errors?.['min']"
+            >El stock no puede ser negativo.</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="form-control">
+      <label for="selectedCategoryId" class="label"
+        ><span class="label-text">Categoría</span></label
+      >
+      <select
+        id="selectedCategoryId"
+        name="selectedCategoryId"
+        [(ngModel)]="selectedCategoryId"
+        required
+        #categoryCtrl="ngModel"
+        class="select select-bordered w-full"
+        [class.select-error]="
+          (categoryCtrl.invalid && categoryCtrl.touched) ||
+          (errorMessage() && !selectedCategoryId())
+        "
+        [disabled]="isFetchingCategories() || categories().length === 0"
+      >
+        <option [ngValue]="null" disabled>
+          {{
+            isFetchingCategories()
+              ? "Cargando categorías..."
+              : categories().length === 0 && !categoriesError()
+              ? "No hay categorías"
+              : "Selecciona una categoría"
+          }}
+        </option>
+        <option *ngFor="let category of categories()" [ngValue]="category.id">
+          {{ category.nombre }} (ID: {{ category.id }})
+        </option>
+      </select>
+      <div
+        *ngIf="categoryCtrl.invalid && categoryCtrl.touched"
+        class="label text-error text-xs"
+      >
+        <span *ngIf="categoryCtrl.errors?.['required']"
+          >Debes seleccionar una categoría.</span
+        >
+      </div>
+      <div
+        *ngIf="errorMessage() && !selectedCategoryId() && productForm.submitted"
+        class="label text-error text-xs"
+      >
+        <span>Por favor, selecciona una categoría.</span>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3 pt-4">
+      <a
+        routerLink="/seller/inventory"
+        class="btn btn-ghost"
+        type="button"
+        [class.btn-disabled]="isLoading()"
+      >
+        Cancelar
+      </a>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="
+          isLoading() ||
+          isFetchingCategories() ||
+          productForm.invalid ||
+          !selectedCategoryId()
+        "
+      >
+        <span
+          *ngIf="isLoading()"
+          class="loading loading-spinner loading-xs"
+        ></span>
+        {{ isLoading() ? "Creando..." : "Crear Producto" }}
+      </button>
+    </div>
+  </form>
+</div>

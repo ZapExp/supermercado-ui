@@ -6,6 +6,9 @@ import { SellerComponent } from './routes/seller/seller.component';
 import { SellComponent } from './routes/seller/sell/sell.component';
 import { NotFoundComponent } from './routes/error/not-found/not-found.component';
 import { InventoryComponent } from './routes/seller/inventory/inventory.component';
+import { CreateProductComponent } from './routes/seller/inventory/create-product/create-product.component';
+import { CategoryComponent } from './routes/seller/category/category.component';
+import { CreateCategoryComponent } from './routes/seller/category/create-category/create-category.component';
 
 export const routes: Routes = [
   {
@@ -19,10 +22,25 @@ export const routes: Routes = [
       { path: 'home', component: HomePageComponent },
       {
         path: 'seller',
-        component: SellerComponent, // inner layout
+        component: SellerComponent,
         children: [
           { path: 'sell', component: SellComponent },
-          { path: 'inventory', component: InventoryComponent },
+          {
+            path: 'inventory',
+            component: InventoryComponent,
+          },
+          {
+            path: 'inventory/create-product',
+            component: CreateProductComponent,
+          },
+          {
+            path: 'category',
+            component: CategoryComponent,
+          },
+          {
+            path: 'category/create-category',
+            component: CreateCategoryComponent,
+          },
         ],
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' },

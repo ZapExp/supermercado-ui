@@ -6,9 +6,9 @@ import {
   OnInit,
   signal,
   ViewChild,
+  OnDestroy,
 } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import type { Product } from '../../../utils/types';
 import {
   catchError,
   combineLatest,
@@ -31,14 +31,19 @@ import { ConfirmationDialogComponent } from '../../../components/confirmation-di
 import { ConfirmationResult } from '../../../utils/types';
 import { RouterLink } from '@angular/router';
 
+export interface Category {
+  id: number;
+  nombre: string;
+}
+
 @Component({
-  selector: 'app-inventory',
+  selector: 'app-categories',
   standalone: true,
   imports: [CommonModule, FormsModule, ConfirmationDialogComponent, RouterLink],
-  templateUrl: './inventory.component.html',
-  styleUrl: './inventory.component.css',
+  templateUrl: './category.component.html',
+  styleUrl: './category.component.css',
 })
-export class InventoryComponent implements OnInit {
+export class CategoryComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
 
@@ -47,7 +52,7 @@ export class InventoryComponent implements OnInit {
   public errorMessage = signal<string | null>(null);
   public successMessage = signal<string | null>(null);
 
-  public products$!: Observable<Product[]>;
+  public categories$!: Observable<Category[]>;
 
   public searchText = model<string>('');
   private searchText$: Observable<string> = toObservable(this.searchText).pipe(
@@ -59,30 +64,27 @@ export class InventoryComponent implements OnInit {
   @ViewChild(ConfirmationDialogComponent)
   dialog!: ConfirmationDialogComponent<number>;
 
-  private refreshProductsTrigger$ = new BehaviorSubject<void>(undefined);
-
+  private refreshCategoriesTrigger$ = new BehaviorSubject<void>(undefined);
   private deleteSubscription: Subscription | undefined;
 
   ngOnInit(): void {
-    this.products$ = this.setupProductStream();
+    this.categories$ = this.setupCategoryStream();
   }
 
-  private fetchAllProducts(): Observable<Product[]> {
+  private fetchAllCategories(): Observable<Category[]> {
     this.isLoading.set(true);
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
-    return this.http.get<Product[]>(`${this.apiUrl}/producto`).pipe(
+    // Using /models/categoria as shown in the image screenshot
+    return this.http.get<Category[]>(`${this.apiUrl}/categoria`).pipe(
       map((response) => {
-        if (response) {
-          return response;
-        }
-        return [];
+        return response || []; // API is expected to return Category[] or null
       }),
       catchError((error) => {
-        console.error('API Error fetching products:', error);
+        console.error('API Error fetching categories:', error);
         this.errorMessage.set(
-          'Failed to fetch product data. Please try again.'
+          'Fallo al cargar la lista de categorías. Por favor, inténtelo de nuevo.'
         );
         return of([]);
       }),
@@ -92,19 +94,19 @@ export class InventoryComponent implements OnInit {
     );
   }
 
-  private setupProductStream(): Observable<Product[]> {
-    const productsUnfiltered$ = this.refreshProductsTrigger$.pipe(
-      switchMap(() => this.fetchAllProducts())
+  private setupCategoryStream(): Observable<Category[]> {
+    const categoriesUnfiltered$ = this.refreshCategoriesTrigger$.pipe(
+      switchMap(() => this.fetchAllCategories())
     );
 
-    return combineLatest([productsUnfiltered$, this.searchText$]).pipe(
-      map(([products, search]) => {
+    return combineLatest([categoriesUnfiltered$, this.searchText$]).pipe(
+      map(([categories, search]) => {
         if (!search) {
-          return products;
+          return categories;
         }
         const lowerCaseSearch = search.toLowerCase();
-        return products.filter((product) =>
-          product.nombre.toLowerCase().includes(lowerCaseSearch)
+        return categories.filter((category) =>
+          category.nombre.toLowerCase().includes(lowerCaseSearch)
         );
       })
     );
@@ -114,9 +116,9 @@ export class InventoryComponent implements OnInit {
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
-    const message = `¿Estás seguro de que deseas eliminar el producto "${name}" (ID: ${id})?`;
+    const message = `¿Estás seguro de que deseas eliminar la categoría "${name}" (ID: ${id})?`;
     this.dialog.message.set(message);
-    this.dialog.title.set(`Confirmar eliminación`);
+    this.dialog.title.set(`Confirmar eliminación de categoría`);
     this.dialog.confirmButtonText.set('Sí, Eliminar');
     this.dialog.open(id);
   }
@@ -126,7 +128,7 @@ export class InventoryComponent implements OnInit {
       return;
     }
 
-    const productIdToDelete = result.data;
+    const categoryIdToDelete = result.data;
     this.isDeleting.set(true);
     this.errorMessage.set(null);
     this.successMessage.set(null);
@@ -134,20 +136,20 @@ export class InventoryComponent implements OnInit {
     this.deleteSubscription?.unsubscribe();
 
     this.deleteSubscription = this.http
-      .delete(`${this.apiUrl}/producto/${productIdToDelete}`)
+      .delete(`${this.apiUrl}/categoria/${categoryIdToDelete}`)
       .pipe(
         tap(() => {
           this.successMessage.set(
-            `Producto ID ${productIdToDelete} eliminado con éxito.`
+            `Categoría ID ${categoryIdToDelete} eliminada con éxito.`
           );
-          this.refreshProductsTrigger$.next();
+          this.refreshCategoriesTrigger$.next();
           setTimeout(() => this.successMessage.set(null), 3000);
         }),
         catchError((error) => {
           const detail =
             error.error?.message || error.message || 'Error desconocido.';
           this.errorMessage.set(
-            `Fallo al eliminar el producto ID ${productIdToDelete}. Detalle: ${detail}`
+            `Fallo al eliminar la categoría ID ${categoryIdToDelete}. Detalle: ${detail}`
           );
           return of(null);
         }),
@@ -160,5 +162,6 @@ export class InventoryComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.deleteSubscription?.unsubscribe();
+    this.refreshCategoriesTrigger$.complete();
   }
 }

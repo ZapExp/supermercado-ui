@@ -5,25 +5,21 @@ export interface UserData {
   name: string;
 }
 
-export interface ProductRaw {
-  id: number;
-  nombre: string | null;
-  descripcion: string | null;
-  precio: number | null;
-  stock: number | null;
-  categoria_id: number;
-}
-
 export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
+  id?: number;
+  nombre: string;
+  descripcion: string;
+  precio: number;
   stock: number;
-  category_id: number;
+  categoria_id: number;
 }
 
 export interface ConfirmationResult<T> {
   confirmed: boolean;
   data: T | null;
+}
+
+export interface Category {
+  id: number;
+  nombre: string;
 }
