@@ -10,6 +10,7 @@ import { CreateProductComponent } from './routes/seller/inventory/create-product
 import { CategoryComponent } from './routes/seller/category/category.component';
 import { CreateCategoryComponent } from './routes/seller/category/create-category/create-category.component';
 import { EditProductComponent } from './routes/seller/inventory/edit-product/edit-product.component';
+import { EditCategoryComponent } from './routes/seller/category/edit-category/edit-category.component';
 
 export const routes: Routes = [
   {
@@ -45,6 +46,10 @@ export const routes: Routes = [
           {
             path: 'category/create-category',
             component: CreateCategoryComponent,
+          },
+          {
+            path: 'category/edit-category/:id',
+            component: EditCategoryComponent,
           },
         ],
       },

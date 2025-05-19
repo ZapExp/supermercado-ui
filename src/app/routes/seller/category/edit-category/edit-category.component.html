@@ -1,0 +1,170 @@
+<div class="max-w-2xl mx-auto p-4">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-3xl font-semibold">
+      Editar Categoría
+      <span *ngIf="categoryId && !isFetchingData()"
+        >(ID: {{ categoryId }})</span
+      >
+    </h1>
+    <a
+      routerLink="/seller/category"
+      class="btn btn-ghost"
+      aria-label="Volver a la lista de categorías"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-5 h-5 mr-1"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+        />
+      </svg>
+      Volver a la lista
+    </a>
+  </div>
+  <div class="divider"></div>
+
+  <div *ngIf="isFetchingData()" class="alert alert-info shadow-lg my-4">
+    <div>
+      <span class="loading loading-spinner"></span>
+      <span>Cargando datos de la categoría...</span>
+    </div>
+  </div>
+
+  <div *ngIf="categoryNotFoundError()" class="alert alert-error shadow-lg my-4">
+    <div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span>{{ errorMessage() }}. No se puede editar.</span>
+    </div>
+  </div>
+
+  <div
+    class="my-4 space-y-2"
+    *ngIf="!isFetchingData() && !categoryNotFoundError()"
+  >
+    <div *ngIf="isLoading()" class="alert alert-info shadow-lg">
+      <div>
+        <span class="loading loading-spinner"></span>
+        <span>Actualizando categoría, por favor espere...</span>
+      </div>
+    </div>
+
+    <div
+      *ngIf="errorMessage() && !isLoading() && !categoryNotFoundError()"
+      class="alert alert-error shadow-lg"
+    >
+      <div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>Error: {{ errorMessage() }}</span>
+      </div>
+    </div>
+    <div *ngIf="successMessage()" class="alert alert-success shadow-lg">
+      <div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>{{ successMessage() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <form
+    *ngIf="!isFetchingData() && !categoryNotFoundError()"
+    #categoryForm="ngForm"
+    (ngSubmit)="submitForm(categoryForm)"
+    class="space-y-6 bg-base-200 p-6 rounded-lg shadow"
+  >
+    <div class="form-control">
+      <label for="categoryName" class="label"
+        ><span class="label-text">Nombre de la Categoría</span></label
+      >
+      <input
+        id="categoryName"
+        name="categoryName"
+        type="text"
+        [(ngModel)]="categoryName"
+        required
+        minlength="3"
+        #nameCtrl="ngModel"
+        class="input input-bordered w-full"
+        [class.input-error]="nameCtrl.invalid && nameCtrl.touched"
+        placeholder="Ej: Electrónica, Ropa, Alimentos"
+      />
+      <div
+        *ngIf="nameCtrl.invalid && nameCtrl.touched"
+        class="label text-error text-xs"
+      >
+        <span *ngIf="nameCtrl.errors?.['required']"
+          >El nombre es requerido.</span
+        >
+        <span *ngIf="nameCtrl.errors?.['minlength']"
+          >El nombre debe tener al menos 3 caracteres.</span
+        >
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3 pt-4">
+      <a
+        routerLink="/seller/category"
+        class="btn btn-ghost"
+        type="button"
+        [class.btn-disabled]="isLoading()"
+      >
+        Cancelar
+      </a>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="
+          isLoading() || categoryForm.invalid || !categoryName().trim()
+        "
+      >
+        <span
+          *ngIf="isLoading()"
+          class="loading loading-spinner loading-xs"
+        ></span>
+        {{ isLoading() ? "Actualizando..." : "Actualizar Categoría" }}
+      </button>
+    </div>
+  </form>
+</div>
