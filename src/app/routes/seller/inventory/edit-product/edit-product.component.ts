@@ -1,20 +1,11 @@
-// Предположим, что этот файл находится по пути: src/app/pages/seller/inventory/edit-product/edit-product.component.ts
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, model, OnInit, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { environment } from '../../../../../environments/environment'; // Adjust path
-import {
-  catchError,
-  finalize,
-  tap,
-  throwError,
-  switchMap,
-  forkJoin,
-  of,
-} from 'rxjs';
-import { Category, Product } from '../../../../utils/types';
+import { environment } from '../../../../../environments/environment';
+import { catchError, finalize, tap, of, throwError } from 'rxjs';
+import { Product, Category } from '../../../../utils/types';
 
 @Component({
   selector: 'app-edit-product',
@@ -31,83 +22,100 @@ export class EditProductComponent implements OnInit {
 
   public productId: number | null = null;
 
-  // Form models
   public productName = model<string>('');
   public productDescription = model<string>('');
   public productPrice = model<number | null>(null);
   public productStock = model<number | null>(null);
   public selectedCategoryId = model<number | null>(null);
 
-  // State signals
   public isLoading = signal(false);
-  public isFetchingData = signal(false);
+  public isFetchingProduct = signal(false);
+  public isFetchingCategories = signal(false);
+
   public errorMessage = signal<string | null>(null);
   public successMessage = signal<string | null>(null);
 
   public categories = signal<Category[]>([]);
-  public categoriesError = signal<string | null>(null);
+  public categoriesErrorMessage = signal<string | null>(null);
   public productNotFoundError = signal<boolean>(false);
 
   ngOnInit(): void {
-    this.isFetchingData.set(true);
-    this.route.paramMap
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    this.productNotFoundError.set(false);
+    this.categoriesErrorMessage.set(null);
+    this.categories.set([]);
+
+    this.route.paramMap.subscribe((params) => {
+      const idParam = params.get('id');
+      if (!idParam) {
+        this.errorMessage.set('ID de producto no encontrado en la URL.');
+        this.productNotFoundError.set(true);
+        this.isFetchingProduct.set(false);
+        this.isFetchingCategories.set(false);
+        return;
+      }
+      this.productId = +idParam;
+
+      this.fetchProductDetails(this.productId);
+
+      this.fetchCategoriesList();
+    });
+  }
+
+  private fetchProductDetails(id: number): void {
+    this.isFetchingProduct.set(true);
+    this.productNotFoundError.set(false);
+    this.errorMessage.set(null);
+
+    this.http
+      .get<Product>(`${this.apiUrl}/producto/${id}`)
       .pipe(
-        switchMap((params) => {
-          const id = params.get('id');
-          if (!id) {
-            this.errorMessage.set('ID de producto no encontrado en la URL.');
-            this.productNotFoundError.set(true);
-            this.isFetchingData.set(false);
-            return throwError(() => new Error('ID de producto no encontrado'));
-          }
-          this.productId = +id;
-
-          const productDetails$ = this.http.get<Product>(
-            `${this.apiUrl}/producto/${this.productId}`
-          );
-          const categories$ = this.http.get<Category[]>(
-            `${this.apiUrl}/categoria`
-          );
-
-          return forkJoin({
-            product: productDetails$,
-            categories: categories$,
-          });
-        }),
-        tap(({ product, categories }) => {
+        tap((product) => {
           this.populateForm(product);
-          this.categories.set(categories || []);
-          if (!categories || categories.length === 0) {
-            this.categoriesError.set(
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('API Error fetching product details:', error);
+          if (error.status === 404) {
+            this.errorMessage.set(`Producto con ID ${id} no encontrado.`);
+            this.productNotFoundError.set(true);
+          } else {
+            this.errorMessage.set('Fallo al cargar los detalles del producto.');
+          }
+          return of(null);
+        }),
+        finalize(() => {
+          this.isFetchingProduct.set(false);
+        })
+      )
+      .subscribe();
+  }
+
+  fetchCategoriesList(): void {
+    this.isFetchingCategories.set(true);
+    this.categoriesErrorMessage.set(null);
+    this.categories.set([]);
+
+    this.http
+      .get<Category[]>(`${this.apiUrl}/categoria`)
+      .pipe(
+        tap((data) => {
+          this.categories.set(data || []);
+          if (!data || data.length === 0) {
+            this.categoriesErrorMessage.set(
               'No hay categorías disponibles. Por favor, crea una categoría primero.'
             );
           }
         }),
         catchError((error: HttpErrorResponse) => {
-          console.error(
-            'API Error fetching product data or categories:',
-            error
+          this.categoriesErrorMessage.set(
+            'Fallo al cargar la lista de categorías.'
           );
-          if (
-            error.status === 404 &&
-            error.url?.includes(`/producto/${this.productId}`)
-          ) {
-            this.errorMessage.set(
-              `Producto con ID ${this.productId} no encontrado.`
-            );
-            this.productNotFoundError.set(true);
-          } else if (error.url?.includes('/categoria')) {
-            this.categoriesError.set('Fallo al cargar las categorías.');
-            this.categories.set([]);
-          } else {
-            this.errorMessage.set(
-              'Fallo al cargar los datos del producto. Por favor, inténtelo de nuevo.'
-            );
-          }
+          this.categories.set([]);
           return of(null);
         }),
         finalize(() => {
-          this.isFetchingData.set(false);
+          this.isFetchingCategories.set(false);
         })
       )
       .subscribe();
@@ -118,23 +126,31 @@ export class EditProductComponent implements OnInit {
     this.productDescription.set(product.descripcion);
     this.productPrice.set(product.precio);
     this.productStock.set(product.stock);
-    this.selectedCategoryId.set(product.categoria_id);
+
+    if (product.categoria_id) {
+      this.selectedCategoryId.set(product.categoria_id);
+    }
   }
 
   submitForm(form: NgForm): void {
-    if (form.invalid || this.productId === null) {
+    if (form.invalid) {
       this.errorMessage.set(
         'Por favor, completa todos los campos requeridos correctamente.'
       );
-      Object.values(form.controls).forEach((control) => {
-        control.markAsTouched();
-      });
+      Object.values(form.controls).forEach((control) =>
+        control.markAsTouched()
+      );
       return;
     }
-
     if (this.selectedCategoryId() === null) {
       this.errorMessage.set(
         'Por favor, selecciona una categoría para el producto.'
+      );
+      return;
+    }
+    if (this.productId === null) {
+      this.errorMessage.set(
+        'Error: ID de producto no disponible para la actualización.'
       );
       return;
     }
@@ -144,6 +160,7 @@ export class EditProductComponent implements OnInit {
     this.successMessage.set(null);
 
     const payload: Product = {
+      id: this.productId,
       nombre: this.productName(),
       descripcion: this.productDescription(),
       precio: this.productPrice() as number,
@@ -158,13 +175,11 @@ export class EditProductComponent implements OnInit {
           this.successMessage.set(
             `Producto "${payload.nombre}" (ID: ${this.productId}) actualizado con éxito.`
           );
-          setTimeout(() => {
-            this.router.navigate(['/seller/inventory']);
-          }, 2000);
         }),
         catchError((error: HttpErrorResponse) => {
           console.error('API Error updating product:', error);
           let detail = 'Error desconocido.';
+
           if (error.error) {
             if (typeof error.error === 'string') {
               detail = error.error;
@@ -179,9 +194,7 @@ export class EditProductComponent implements OnInit {
               } else {
                 try {
                   detail = JSON.stringify(error.error);
-                } catch (e) {
-                  /* ignore */
-                }
+                } catch (e) {}
               }
             }
           } else {

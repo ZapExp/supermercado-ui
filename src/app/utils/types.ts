@@ -20,6 +20,6 @@ export interface ConfirmationResult<T> {
 }
 
 export interface Category {
-  id: number;
+  id?: number;
   nombre: string;
 }
