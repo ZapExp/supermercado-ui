@@ -140,7 +140,11 @@
             </td>
             <td>
               <div class="flex gap-2">
-                <button class="btn btn-sm btn-warning">Editar</button>
+                <a
+                  [routerLink]="['/seller/inventory/edit-product', product.id]"
+                  class="btn btn-sm btn-warning"
+                  >Editar</a
+                >
                 <button
                   class="btn btn-sm btn-error"
                   (click)="

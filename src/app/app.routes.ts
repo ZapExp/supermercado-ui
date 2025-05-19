@@ -9,6 +9,7 @@ import { InventoryComponent } from './routes/seller/inventory/inventory.componen
 import { CreateProductComponent } from './routes/seller/inventory/create-product/create-product.component';
 import { CategoryComponent } from './routes/seller/category/category.component';
 import { CreateCategoryComponent } from './routes/seller/category/create-category/create-category.component';
+import { EditProductComponent } from './routes/seller/inventory/edit-product/edit-product.component';
 
 export const routes: Routes = [
   {
@@ -32,6 +33,10 @@ export const routes: Routes = [
           {
             path: 'inventory/create-product',
             component: CreateProductComponent,
+          },
+          {
+            path: 'inventory/edit-product/:id',
+            component: EditProductComponent,
           },
           {
             path: 'category',
