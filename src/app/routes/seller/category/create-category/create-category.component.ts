@@ -6,7 +6,6 @@ import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../../../environments/environment';
 import { catchError, finalize, tap, throwError } from 'rxjs';
 
-// Interface for the POST request payload
 interface CreateCategoryPayload {
   nombre: string;
 }
@@ -58,7 +57,6 @@ export class CreateCategoryComponent {
             } else if (error.error.message) {
               detail = error.error.message;
             } else if (error.error.detail) {
-              // Common in Django REST Framework
               detail = error.error.detail;
             } else if (
               Array.isArray(error.error) &&

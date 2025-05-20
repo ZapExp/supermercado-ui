@@ -1,2 +1,240 @@
-<div>Hola {{ userData().name }}, ¿sale venta hoy?</div>
-<a [routerLink]="'/seller/sell'" class="link">Si sale xd</a>
+<div class="container mx-auto p-4 md:p-8">
+  <h1 class="text-4xl font-bold mb-8 text-center text-primary">
+    Bienvenido
+    <span class="text-secondary">
+      {{ userData().name }}
+    </span>
+    , ¿Listo para vender?
+  </h1>
+  <div class="divider"></div>
+
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8"
+  >
+    <div
+      class="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out transform hover:-translate-y-1"
+    >
+      <a [routerLink]="'/seller/sell'" class="block h-full">
+        <div
+          class="card-body items-center text-center p-6 flex flex-col justify-center h-full"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 mb-3 text-secondary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
+          <h2 class="card-title text-xl font-semibold text-base-content">
+            Registrar Venta
+          </h2>
+          <p class="text-sm text-base-content/70 mt-1">
+            Realizar una nueva venta de productos.
+          </p>
+        </div>
+      </a>
+    </div>
+
+    <div
+      class="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out transform hover:-translate-y-1"
+    >
+      <a [routerLink]="'/seller/inventory'" class="block h-full">
+        <div
+          class="card-body items-center text-center p-6 flex flex-col justify-center h-full"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 mb-3 text-secondary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+            />
+          </svg>
+          <h2 class="card-title text-xl font-semibold text-base-content">
+            Inventario
+          </h2>
+          <p class="text-sm text-base-content/70 mt-1">
+            Gestionar productos y stock.
+          </p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Categorías -->
+    <div
+      class="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out transform hover:-translate-y-1"
+    >
+      <a [routerLink]="'/seller/category'" class="block h-full">
+        <div
+          class="card-body items-center text-center p-6 flex flex-col justify-center h-full"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 mb-3 text-secondary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+            />
+          </svg>
+          <h2 class="card-title text-xl font-semibold text-base-content">
+            Categorías
+          </h2>
+          <p class="text-sm text-base-content/70 mt-1">
+            Administrar categorías de productos.
+          </p>
+        </div>
+      </a>
+    </div>
+
+    <div
+      class="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out transform hover:-translate-y-1"
+    >
+      <a [routerLink]="'/seller/report'" class="block h-full">
+        <div
+          class="card-body items-center text-center p-6 flex flex-col justify-center h-full"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 mb-3 text-secondary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <h2 class="card-title text-xl font-semibold text-base-content">
+            Reportes
+          </h2>
+          <p class="text-sm text-base-content/70 mt-1">
+            Visualizar informes de ventas y rendimiento.
+          </p>
+        </div>
+      </a>
+    </div>
+
+    <div
+      class="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out transform hover:-translate-y-1"
+    >
+      <a [routerLink]="'/seller/suppliers'" class="block h-full">
+        <div
+          class="card-body items-center text-center p-6 flex flex-col justify-center h-full"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 mb-3 text-secondary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16m-4.879-1L17.75 10.75M13 16H9.75M13 16h2.75M10.75 8.75c0-1.105.895-2 2-2h2.5c1.105 0 2 .895 2 2v.25c0 .966-.784 1.75-1.75 1.75h-3.5A1.75 1.75 0 0110.75 11V8.75z"
+            />
+          </svg>
+          <h2 class="card-title text-xl font-semibold text-base-content">
+            Proveedores
+          </h2>
+          <p class="text-sm text-base-content/70 mt-1">
+            Gestionar información de proveedores.
+          </p>
+        </div>
+      </a>
+    </div>
+
+    <div
+      class="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out transform hover:-translate-y-1"
+    >
+      <a [routerLink]="'/seller/promotions'" class="block h-full">
+        <div
+          class="card-body items-center text-center p-6 flex flex-col justify-center h-full"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 mb-3 text-secondary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15 13H9m6 4H9m4-8l2-2m-2 2l-2-2m2 2v4"
+            />
+          </svg>
+          <h2 class="card-title text-xl font-semibold text-base-content">
+            Promociones
+          </h2>
+          <p class="text-sm text-base-content/70 mt-1">
+            Crear y administrar promociones.
+          </p>
+        </div>
+      </a>
+    </div>
+
+    <div
+      class="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out transform hover:-translate-y-1"
+    >
+      <a [routerLink]="'/seller/social'" class="block h-full">
+        <div
+          class="card-body items-center text-center p-6 flex flex-col justify-center h-full"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 mb-3 text-secondary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+            />
+          </svg>
+          <h2 class="card-title text-xl font-semibold text-base-content">
+            Red Social
+          </h2>
+          <p class="text-sm text-base-content/70 mt-1">
+            Configurar enlaces a redes sociales.
+          </p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

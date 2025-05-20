@@ -19,14 +19,12 @@ export class CreateProductComponent implements OnInit {
   private router = inject(Router);
   private apiUrl = environment.apiUrl;
 
-  // Form models
   public productName = model<string>('');
   public productDescription = model<string>('');
   public productPrice = model<number | null>(null);
   public productStock = model<number | null>(null);
   public selectedCategoryId = model<number | null>(null);
 
-  // State signals
   public isLoading = signal(false);
   public isFetchingCategories = signal(false);
   public errorMessage = signal<string | null>(null);

@@ -23,3 +23,38 @@ export interface Category {
   id?: number;
   nombre: string;
 }
+
+export interface Client {
+  id: number;
+  nombre: string;
+  email?: string;
+  telefono?: string;
+}
+
+export interface SaleCartItem {
+  productId: number;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  availableStock: number;
+}
+
+export interface CreateSaleResponse {
+  id: number;
+  cliente_id: number;
+  total: number;
+  fecha: string;
+}
+
+export interface CreateSaleDetailPayload {
+  venta_id: number;
+  producto_id: number;
+  cantidad: number;
+  subtotal: number;
+}
+
+export interface CreateSalePayload {
+  cliente_id: number;
+  total: number;
+}

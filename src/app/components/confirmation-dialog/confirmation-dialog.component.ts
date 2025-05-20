@@ -39,7 +39,6 @@ export class ConfirmationDialogComponent<T = number> {
     }
   }
 
-  /** Closes the dialog without emitting an event. */
   public close(): void {
     if (this.dialogRef?.nativeElement) {
       this.dialogRef.nativeElement.close();

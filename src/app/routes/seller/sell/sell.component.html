@@ -1,2 +1,253 @@
-<h1 class="text-3xl">Registrar Venta</h1>
+<h1 class="text-3xl font-semibold mb-6">Registrar Venta</h1>
 <div class="divider"></div>
+
+<div class="flex flex-col gap-4">
+  <div>
+    <h2 class="text-xl font-medium mb-2">1. Cliente</h2>
+    <div class="form-control relative">
+      <label class="label"
+        ><span class="label-text">Buscar o seleccionar cliente</span></label
+      >
+      <div class="flex items-center gap-2">
+        <input
+          type="text"
+          placeholder="Buscar cliente por nombre, email o teléfono..."
+          class="input input-bordered w-full"
+          [(ngModel)]="clientSearchText"
+          (focus)="onClientSearchFocus()"
+          (blur)="hideClientSuggestions()"
+          [readOnly]="selectedClient() !== null"
+        />
+        <button
+          *ngIf="selectedClient()"
+          class="btn btn-secondary"
+          (click)="clearSelectedClient()"
+          title="Cambiar cliente"
+        >
+          Cambiar cliente
+        </button>
+      </div>
+
+      <div
+        *ngIf="isFetchingAllClients()"
+        class="absolute right-2 top-10 text-xs text-info z-10"
+      >
+        Cargando lista de clientes...
+        <span class="loading loading-spinner loading-xs"></span>
+      </div>
+
+      <ul
+        *ngIf="
+          showClientSuggestions() &&
+          searchedClients().length > 0 &&
+          !selectedClient()
+        "
+        class="absolute z-20 w-full bg-base-100 border border-base-300 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto"
+      >
+        <li
+          *ngFor="let client of searchedClients()"
+          (click)="selectClient(client)"
+          class="px-4 py-2 hover:bg-base-300 cursor-pointer"
+        >
+          <div>
+            <strong>{{ client.nombre }}</strong> (ID: {{ client.id }})
+          </div>
+          <div class="text-xs opacity-70" *ngIf="client.email">
+            {{ client.email }}
+            <span *ngIf="client.telefono">| {{ client.telefono }}</span>
+          </div>
+          <div
+            class="text-xs opacity-70"
+            *ngIf="!client.email && client.telefono"
+          >
+            {{ client.telefono }}
+          </div>
+        </li>
+      </ul>
+      <div
+        *ngIf="
+          showClientSuggestions() &&
+          searchedClients().length === 0 &&
+          clientSearchText().length > 0 &&
+          !isFetchingAllClients() &&
+          !selectedClient()
+        "
+        class="absolute z-20 w-full bg-base-100 border border-base-300 rounded-md shadow-lg mt-1 px-4 py-2 text-sm text-neutral-content"
+      >
+        No se encontraron clientes para "{{ clientSearchText() }}".
+      </div>
+      <div *ngIf="clientsErrorMessage()" class="text-error text-xs mt-1">
+        {{ clientsErrorMessage() }}
+      </div>
+    </div>
+    <div
+      *ngIf="selectedClient()"
+      class="mt-2 p-3 bg-secondary/10 rounded text-sm"
+    >
+      Cliente Seleccionado: <strong>{{ selectedClient()?.nombre }}</strong> (ID:
+      {{ selectedClient()?.id }})
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div>
+    <h2 class="text-xl font-medium mb-2">2. Añadir Productos</h2>
+    <div class="form-control relative">
+      <label class="label"
+        ><span class="label-text"
+          >Buscar producto por nombre o código</span
+        ></label
+      >
+      <input
+        type="text"
+        placeholder="Ej: Laptop, Manzana, 00123"
+        class="input input-bordered w-full"
+        [(ngModel)]="productSearchText"
+        (focus)="onProductSearchFocus()"
+        (blur)="hideProductSuggestions()"
+      />
+      <div
+        *ngIf="isFetchingAllProducts()"
+        class="absolute right-2 top-10 text-xs text-info z-10"
+      >
+        Cargando lista de productos...
+        <span class="loading loading-spinner loading-xs"></span>
+      </div>
+
+      <ul
+        *ngIf="
+          showProductSuggestions() &&
+          searchedProducts().length > 0 &&
+          productSearchText().length > 1
+        "
+        class="absolute z-10 w-full bg-base-100 border border-base-300 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto"
+      >
+        <li
+          *ngFor="let product of searchedProducts()"
+          (click)="addProductToCart(product)"
+          class="px-4 py-2 hover:bg-base-300 cursor-pointer"
+        >
+          {{ product.nombre }} (Stock: {{ product.stock }}) -
+          {{ product.precio | currency : "$ " : "symbol" }}
+        </li>
+      </ul>
+      <div
+        *ngIf="
+          showProductSuggestions() &&
+          searchedProducts().length === 0 &&
+          productSearchText().length > 1 &&
+          !isFetchingAllProducts()
+        "
+        class="absolute z-10 w-full bg-base-100 border border-base-300 rounded-md shadow-lg mt-1 px-4 py-2 text-sm text-neutral-content"
+      >
+        No se encontraron productos para "{{ productSearchText() }}"
+      </div>
+    </div>
+    <div *ngIf="productSearchErrorMessage()" class="text-error text-xs mt-1">
+      {{ productSearchErrorMessage() }}
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div>
+    <h2 class="text-xl font-medium mb-2">3. Productos en la Venta</h2>
+    <div *ngIf="cartItems().length === 0" class="text-center py-4">
+      El carrito está vacío. Añade productos para continuar.
+    </div>
+    <div *ngIf="cartItems().length > 0" class="overflow-x-auto">
+      <table class="table w-full">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th class="w-32">Cantidad</th>
+            <th>Precio Unit.</th>
+            <th>Subtotal</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of cartItems()" class="hover">
+            <td>
+              {{ item.productName }}
+              <span class="text-xs opacity-70"
+                >(Stock: {{ item.availableStock }})</span
+              >
+            </td>
+            <td>
+              <input
+                type="number"
+                min="1"
+                [max]="item.availableStock"
+                class="input input-bordered input-sm w-24 text-center"
+                [value]="item.quantity"
+                (change)="
+                  updateCartItemQuantity(
+                    item.productId,
+                    getNumericValueFromEvent($event)
+                  )
+                "
+              />
+            </td>
+            <td>{{ item.unitPrice | currency : "$ " : "symbol" }}</td>
+            <td>{{ item.subtotal | currency : "$ " : "symbol" }}</td>
+            <td class="w-10">
+              <button
+                class="btn btn-error btn-sm"
+                (click)="removeCartItem(item.productId)"
+                title="Eliminar producto"
+              >
+                X
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div>
+    <h2 class="text-xl font-medium mb-2">4. Resumen y Pago</h2>
+    <div class="text-2xl font-bold mb-4 text-right">
+      Total a Pagar: {{ saleTotal() | currency : "$ " : "symbol" }}
+    </div>
+
+    <div
+      *ngIf="saleSuccessMessage()"
+      class="alert alert-success shadow-lg mb-4"
+    >
+      <span>{{ saleSuccessMessage() }}</span>
+    </div>
+    <div *ngIf="saleErrorMessage()" class="alert alert-error shadow-lg mb-4">
+      <span>{{ saleErrorMessage() }}</span>
+    </div>
+
+    <div class="flex justify-end gap-4">
+      <button
+        class="btn btn-ghost"
+        (click)="clearSale()"
+        [disabled]="isRegisteringSale()"
+      >
+        Cancelar Venta
+      </button>
+      <button
+        class="btn btn-primary"
+        (click)="registerSale()"
+        [disabled]="
+          isRegisteringSale() ||
+          cartItems().length === 0 ||
+          selectedClient() === null
+        "
+      >
+        <span
+          *ngIf="isRegisteringSale()"
+          class="loading loading-spinner loading-xs"
+        ></span>
+        {{ isRegisteringSale() ? "Registrando..." : "Registrar Venta" }}
+      </button>
+    </div>
+  </div>
+</div>

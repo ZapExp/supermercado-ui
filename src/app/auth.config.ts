@@ -11,7 +11,7 @@ export const authConfig: PassedInitialConfig = {
     responseType: 'code',
     silentRenew: true,
     useRefreshToken: true,
-    logLevel: LogLevel.Debug,
+    logLevel: LogLevel.Warn,
     secureRoutes: [environment.apiUrl],
   },
 };
