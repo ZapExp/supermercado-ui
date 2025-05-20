@@ -1,0 +1,18 @@
+.iframe-container {
+  position: relative;
+  padding-bottom: 75%; /* 4:3 ratio, cambia a 56.25% si quieres 16:9 */
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.iframe-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: #fff;
+}

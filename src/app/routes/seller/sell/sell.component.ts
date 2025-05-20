@@ -276,7 +276,7 @@ export class SellComponent implements OnInit {
     this.showProductSuggestions.set(true);
   }
   hideProductSuggestions(): void {
-    setTimeout(() => this.showProductSuggestions.set(false), 150);
+    setTimeout(() => this.showProductSuggestions.set(false), 300);
   }
 
   addProductToCart(product: Product): void {
