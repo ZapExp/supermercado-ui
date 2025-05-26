@@ -65,3 +65,7 @@ export interface CreateSalePayload {
   cliente_id: number;
   total: number;
 }
+
+export interface ProductDisplay extends Product {
+  categoria_nombre?: string;
+}
