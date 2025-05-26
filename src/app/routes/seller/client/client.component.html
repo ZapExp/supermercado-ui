@@ -1,0 +1,189 @@
+<h1 class="text-3xl font-semibold">Gestión de Clientes</h1>
+
+<div class="divider"></div>
+
+<div class="my-4 space-y-2">
+  <div *ngIf="isLoading() && !isDeleting()" class="alert alert-info shadow-lg">
+    <div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="stroke-current shrink-0 w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <span>Cargando lista de clientes, por favor espere...</span>
+    </div>
+  </div>
+
+  <div *ngIf="isDeleting()" class="alert alert-warning shadow-lg">
+    <div>
+      <span class="loading loading-spinner text-warning"></span>
+      <span>Eliminando cliente...</span>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage()" class="alert alert-error shadow-lg">
+    <div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span>Error: {{ errorMessage() }}</span>
+    </div>
+  </div>
+
+  <div *ngIf="successMessage()" class="alert alert-success shadow-lg">
+    <div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span>{{ successMessage() }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-col gap-4">
+  <div class="flex items-end justify-stretch gap-4">
+    <div class="flex flex-col gap-1 w-full">
+      <div>Buscar cliente (por nombre, email, teléfono)</div>
+      <label class="input input-bordered flex items-center gap-2 w-full">
+        <svg
+          class="h-[1em] opacity-50"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <g
+            stroke-linejoin="round"
+            stroke-linecap="round"
+            stroke-width="2.5"
+            fill="none"
+            stroke="currentColor"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </g>
+        </svg>
+        <input
+          type="text"
+          class="grow text-base w-full"
+          placeholder="Filtrar clientes..."
+          [(ngModel)]="searchText"
+        />
+      </label>
+    </div>
+    <a
+      [routerLink]="'/seller/client/create-client'"
+      class="btn btn-success"
+      aria-label="Añadir nuevo cliente"
+    >
+      Añadir Nuevo Cliente
+    </a>
+  </div>
+
+  <div
+    class="overflow-x-auto"
+    *ngIf="clients$ | async as clients; else noDataOrLoadingState"
+  >
+    <div *ngIf="clients.length > 0; else noClientsFoundAfterSearch">
+      <h2 class="text-2xl">Lista de Clientes</h2>
+      <div class="divider my-2"></div>
+      <table class="table table-zebra w-full">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th class="w-auto text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let client of clients" class="hover:bg-base-300">
+            <th>{{ client.id }}</th>
+            <td>{{ client.nombre }}</td>
+            <td>{{ client.email }}</td>
+            <td>{{ client.telefono }}</td>
+            <td>
+              <div class="flex gap-2 justify-end">
+                <a
+                  [routerLink]="['/seller/client/edit-client', client.id]"
+                  class="btn btn-sm btn-warning"
+                  aria-label="Editar cliente"
+                >
+                  Editar
+                </a>
+                <button
+                  class="btn btn-sm btn-error"
+                  (click)="openDeleteConfirmation(client)"
+                  [disabled]="isDeleting()"
+                  aria-label="Eliminar cliente"
+                >
+                  <span
+                    *ngIf="isDeleting()"
+                    class="loading loading-spinner loading-xs"
+                  ></span>
+                  <span *ngIf="!isDeleting()">Eliminar</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noClientsFoundAfterSearch>
+      <div *ngIf="!isLoading() && searchText()" class="text-center py-8">
+        <p class="text-xl">
+          No se encontraron clientes que coincidan con "{{ searchText() }}".
+        </p>
+      </div>
+    </ng-template>
+  </div>
+
+  <ng-template #noDataOrLoadingState>
+    <div
+      *ngIf="!isLoading() && !errorMessage() && !searchText()"
+      class="text-center py-8"
+    >
+      <p class="text-xl">No hay clientes para mostrar en este momento.</p>
+      <p class="mt-2">
+        Puedes
+        <a
+          [routerLink]="'/seller/client/create-client'"
+          class="link link-primary"
+          >crear un nuevo cliente</a
+        >.
+      </p>
+    </div>
+  </ng-template>
+</div>
+
+<app-confirmation-dialog
+  (confirmed)="handleDeleteConfirmation($event)"
+></app-confirmation-dialog>

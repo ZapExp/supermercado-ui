@@ -1,3 +1,22 @@
-<div class="iframe-container" *ngIf="data()">
+<div *ngIf="isLoading()" class="loading-container">
+  <p>Cargando reporte, por favor espere...</p>
+  <span class="loading loading-spinner loading-lg"></span>
+</div>
+
+<div *ngIf="errorMessage() && !isLoading()" class="error-container">
+  <p>{{ errorMessage() }}</p>
+  <button (click)="retryLoad()" class="btn btn-sm btn-outline mt-2">
+    Reintentar
+  </button>
+</div>
+
+<div class="iframe-container" *ngIf="data() && !isLoading() && !errorMessage()">
   <iframe [src]="data()" allowtransparency></iframe>
+</div>
+
+<div
+  *ngIf="!data() && !isLoading() && !errorMessage()"
+  class="no-data-container"
+>
+  <p>No hay datos para mostrar</p>
 </div>

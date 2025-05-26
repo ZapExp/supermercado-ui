@@ -12,6 +12,9 @@ import { CreateCategoryComponent } from './routes/seller/category/create-categor
 import { EditProductComponent } from './routes/seller/inventory/edit-product/edit-product.component';
 import { EditCategoryComponent } from './routes/seller/category/edit-category/edit-category.component';
 import { ReportComponent } from './routes/report/report.component';
+import { ClientComponent } from './routes/seller/client/client.component';
+import { CreateClientComponent } from './routes/seller/client/create-client/create-client.component';
+import { EditClientComponent } from './routes/seller/client/edit-client/edit-client.component';
 
 export const routes: Routes = [
   {
@@ -27,6 +30,10 @@ export const routes: Routes = [
         path: 'seller',
         component: SellerComponent,
         children: [
+          {
+            path: 'report',
+            component: ReportComponent,
+          },
           { path: 'sell', component: SellComponent },
           {
             path: 'inventory',
@@ -53,8 +60,16 @@ export const routes: Routes = [
             component: EditCategoryComponent,
           },
           {
-            path: 'report',
-            component: ReportComponent,
+            path: 'client',
+            component: ClientComponent,
+          },
+          {
+            path: 'client/create-client',
+            component: CreateClientComponent,
+          },
+          {
+            path: 'client/edit-client/:id',
+            component: EditClientComponent,
           },
         ],
       },

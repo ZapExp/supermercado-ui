@@ -27,8 +27,8 @@ export interface Category {
 export interface Client {
   id: number;
   nombre: string;
-  email?: string;
-  telefono?: string;
+  email: string;
+  telefono: string;
 }
 
 export interface SaleCartItem {

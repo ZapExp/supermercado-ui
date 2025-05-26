@@ -1,0 +1,193 @@
+<div class="max-w-3xl mx-auto p-4">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-3xl font-semibold">Crear Nuevo Cliente</h1>
+    <a
+      routerLink="/seller/client"
+      class="btn btn-ghost"
+      aria-label="Volver a la lista de clientes"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-5 h-5 mr-1"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+        />
+      </svg>
+      Volver a Clientes
+    </a>
+  </div>
+  <div class="divider"></div>
+
+  <div class="my-4 space-y-2">
+    <div *ngIf="isLoading()" class="alert alert-info shadow-lg">
+      <div>
+        <span class="loading loading-spinner"></span>
+        <span>Creando cliente, por favor espere...</span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage()" class="alert alert-error shadow-lg">
+      <div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>Error: {{ errorMessage() }}</span>
+      </div>
+    </div>
+
+    <div *ngIf="successMessage()" class="alert alert-success shadow-lg">
+      <div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>{{ successMessage() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <form
+    #clientForm="ngForm"
+    (ngSubmit)="submitForm(clientForm)"
+    class="space-y-6 bg-base-200 p-6 rounded-lg shadow"
+  >
+    <div class="form-control">
+      <label for="clientName" class="label"
+        ><span class="label-text">Nombre del Cliente</span></label
+      >
+      <input
+        id="clientName"
+        name="clientName"
+        type="text"
+        [(ngModel)]="clientName"
+        required
+        minlength="3"
+        #nameCtrl="ngModel"
+        class="input input-bordered w-full"
+        [class.input-error]="nameCtrl.invalid && nameCtrl.touched"
+        placeholder="Ej: Juan Pérez"
+      />
+      <div
+        *ngIf="nameCtrl.invalid && nameCtrl.touched"
+        class="label text-error text-xs"
+      >
+        <span *ngIf="nameCtrl.errors?.['required']"
+          >El nombre es requerido.</span
+        >
+        <span *ngIf="nameCtrl.errors?.['minlength']"
+          >El nombre debe tener al menos 3 caracteres.</span
+        >
+      </div>
+    </div>
+
+    <div class="form-control">
+      <label for="clientEmail" class="label"
+        ><span class="label-text">Email del Cliente</span></label
+      >
+      <input
+        id="clientEmail"
+        name="clientEmail"
+        type="email"
+        [(ngModel)]="clientEmail"
+        required
+        email
+        #emailCtrl="ngModel"
+        class="input input-bordered w-full"
+        [class.input-error]="emailCtrl.invalid && emailCtrl.touched"
+        placeholder="Ej: juan@example.com"
+      />
+      <div
+        *ngIf="emailCtrl.invalid && emailCtrl.touched"
+        class="label text-error text-xs"
+      >
+        <span *ngIf="emailCtrl.errors?.['required']"
+          >El email es requerido.</span
+        >
+        <span *ngIf="emailCtrl.errors?.['email']"
+          >Ingresa un email válido.</span
+        >
+      </div>
+    </div>
+
+    <div class="form-control">
+      <label for="clientTelefono" class="label"
+        ><span class="label-text">Teléfono del Cliente</span></label
+      >
+      <input
+        id="clientTelefono"
+        name="clientTelefono"
+        type="tel"
+        [(ngModel)]="clientTelefono"
+        required
+        minlength="7"
+        pattern="^[0-9+()\\s-]*$"
+        #telefonoCtrl="ngModel"
+        class="input input-bordered w-full"
+        [class.input-error]="telefonoCtrl.invalid && telefonoCtrl.touched"
+        placeholder="Ej: 123456789"
+      />
+      <div
+        *ngIf="telefonoCtrl.invalid && telefonoCtrl.touched"
+        class="label text-error text-xs"
+      >
+        <span *ngIf="telefonoCtrl.errors?.['required']"
+          >El teléfono es requerido.</span
+        >
+        <span *ngIf="telefonoCtrl.errors?.['minlength']"
+          >El teléfono debe tener al menos 7 dígitos.</span
+        >
+        <span *ngIf="telefonoCtrl.errors?.['pattern']"
+          >Ingresa un número de teléfono válido.</span
+        >
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3 pt-4">
+      <a
+        routerLink="/seller/client"
+        class="btn btn-ghost"
+        type="button"
+        [class.btn-disabled]="isLoading()"
+      >
+        Cancelar
+      </a>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isLoading() || clientForm.invalid"
+      >
+        <span
+          *ngIf="isLoading()"
+          class="loading loading-spinner loading-xs"
+        ></span>
+        {{ isLoading() ? "Creando..." : "Crear Cliente" }}
+      </button>
+    </div>
+  </form>
+</div>
