@@ -15,6 +15,9 @@ import { ReportComponent } from './routes/report/report.component';
 import { ClientComponent } from './routes/seller/client/client.component';
 import { CreateClientComponent } from './routes/seller/client/create-client/create-client.component';
 import { EditClientComponent } from './routes/seller/client/edit-client/edit-client.component';
+import { SupplierComponent } from './routes/seller/supplier/supplier.component';
+import { CreateSupplierComponent } from './routes/seller/supplier/create-supplier/create-supplier.component';
+import { EditSupplierComponent } from './routes/seller/supplier/edit-supplier/edit-supplier.component';
 
 export const routes: Routes = [
   {
@@ -70,6 +73,18 @@ export const routes: Routes = [
           {
             path: 'client/edit-client/:id',
             component: EditClientComponent,
+          },
+          {
+            path: 'supplier',
+            component: SupplierComponent,
+          },
+          {
+            path: 'supplier/create-supplier',
+            component: CreateSupplierComponent,
+          },
+          {
+            path: 'supplier/edit-supplier/:id',
+            component: EditSupplierComponent,
           },
         ],
       },

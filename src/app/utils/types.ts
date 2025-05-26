@@ -31,6 +31,13 @@ export interface Client {
   telefono: string;
 }
 
+export interface Supplier {
+  id: number;
+  nombre: string;
+  contacto: string;
+  direccion: string;
+}
+
 export interface SaleCartItem {
   productId: number;
   productName: string;

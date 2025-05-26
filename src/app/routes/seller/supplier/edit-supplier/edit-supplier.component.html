@@ -1,0 +1,219 @@
+<div class="max-w-3xl mx-auto p-4">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-3xl font-semibold">
+      Editar Proveedor
+      <span *ngIf="supplierId && !isFetchingSupplier()"
+        >(ID: {{ supplierId }})</span
+      >
+    </h1>
+    <a
+      routerLink="/seller/supplier"
+      class="btn btn-ghost"
+      aria-label="Volver a la lista de proveedores"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-5 h-5 mr-1"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+        />
+      </svg>
+      Volver a Proveedores
+    </a>
+  </div>
+  <div class="divider"></div>
+
+  <div *ngIf="isFetchingSupplier()" class="alert alert-info shadow-lg my-4">
+    <div>
+      <span class="loading loading-spinner"></span
+      ><span>Cargando datos del proveedor...</span>
+    </div>
+  </div>
+  <div *ngIf="supplierNotFoundError()" class="alert alert-error shadow-lg my-4">
+    <div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span>{{ errorMessage() }}. No se puede editar.</span>
+    </div>
+  </div>
+
+  <div
+    class="my-4 space-y-2"
+    *ngIf="!isFetchingSupplier() && !supplierNotFoundError()"
+  >
+    <div *ngIf="isLoading()" class="alert alert-info shadow-lg">
+      <div>
+        <span class="loading loading-spinner"></span
+        ><span>Actualizando proveedor, por favor espere...</span>
+      </div>
+    </div>
+    <div
+      *ngIf="errorMessage() && !isLoading() && !supplierNotFoundError()"
+      class="alert alert-error shadow-lg"
+    >
+      <div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>Error: {{ errorMessage() }}</span>
+      </div>
+    </div>
+    <div *ngIf="successMessage()" class="alert alert-success shadow-lg">
+      <div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>{{ successMessage() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <form
+    *ngIf="!isFetchingSupplier() && !supplierNotFoundError()"
+    #supplierForm="ngForm"
+    (ngSubmit)="submitForm(supplierForm)"
+    class="space-y-6 bg-base-200 p-6 rounded-lg shadow"
+  >
+    <div class="form-control">
+      <label for="supplierName" class="label"
+        ><span class="label-text">Nombre del Proveedor</span></label
+      >
+      <input
+        id="supplierName"
+        name="supplierName"
+        type="text"
+        [(ngModel)]="supplierName"
+        required
+        minlength="3"
+        #nameCtrl="ngModel"
+        class="input input-bordered w-full"
+        [class.input-error]="nameCtrl.invalid && nameCtrl.touched"
+        placeholder="Ej: Distribuidora ABC"
+      />
+      <div
+        *ngIf="nameCtrl.invalid && nameCtrl.touched"
+        class="label text-error text-xs"
+      >
+        <span *ngIf="nameCtrl.errors?.['required']"
+          >El nombre es requerido.</span
+        >
+        <span *ngIf="nameCtrl.errors?.['minlength']"
+          >El nombre debe tener al menos 3 caracteres.</span
+        >
+      </div>
+    </div>
+    <div class="form-control">
+      <label for="supplierContact" class="label"
+        ><span class="label-text">Contacto</span></label
+      >
+      <input
+        id="supplierContact"
+        name="supplierContact"
+        type="text"
+        [(ngModel)]="supplierContact"
+        required
+        minlength="5"
+        #contactCtrl="ngModel"
+        class="input input-bordered w-full"
+        [class.input-error]="contactCtrl.invalid && contactCtrl.touched"
+        placeholder="Ej: +57 123 456 7890"
+      />
+      <div
+        *ngIf="contactCtrl.invalid && contactCtrl.touched"
+        class="label text-error text-xs"
+      >
+        <span *ngIf="contactCtrl.errors?.['required']"
+          >El contacto es requerido.</span
+        >
+        <span *ngIf="contactCtrl.errors?.['minlength']"
+          >El contacto debe tener al menos 5 caracteres.</span
+        >
+      </div>
+    </div>
+    <div class="form-control">
+      <label for="supplierAddress" class="label"
+        ><span class="label-text">Dirección</span></label
+      >
+      <textarea
+        id="supplierAddress"
+        name="supplierAddress"
+        [(ngModel)]="supplierAddress"
+        required
+        minlength="10"
+        #addressCtrl="ngModel"
+        class="textarea textarea-bordered w-full h-24"
+        [class.textarea-error]="addressCtrl.invalid && addressCtrl.touched"
+        placeholder="Ej: Calle 10 #5-30, Pasto"
+      ></textarea>
+      <div
+        *ngIf="addressCtrl.invalid && addressCtrl.touched"
+        class="label text-error text-xs"
+      >
+        <span *ngIf="addressCtrl.errors?.['required']"
+          >La dirección es requerida.</span
+        >
+        <span *ngIf="addressCtrl.errors?.['minlength']"
+          >La dirección debe tener al menos 10 caracteres.</span
+        >
+      </div>
+    </div>
+    <div class="flex items-center justify-end gap-3 pt-4">
+      <a
+        routerLink="/seller/supplier"
+        class="btn btn-ghost"
+        type="button"
+        [class.btn-disabled]="isLoading()"
+        >Cancelar</a
+      >
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isLoading() || isFetchingSupplier() || supplierForm.invalid"
+      >
+        <span
+          *ngIf="isLoading()"
+          class="loading loading-spinner loading-xs"
+        ></span>
+        {{ isLoading() ? "Actualizando..." : "Actualizar Proveedor" }}
+      </button>
+    </div>
+  </form>
+</div>
