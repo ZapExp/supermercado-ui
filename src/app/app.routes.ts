@@ -18,6 +18,7 @@ import { EditClientComponent } from './routes/seller/client/edit-client/edit-cli
 import { SupplierComponent } from './routes/seller/supplier/supplier.component';
 import { CreateSupplierComponent } from './routes/seller/supplier/create-supplier/create-supplier.component';
 import { EditSupplierComponent } from './routes/seller/supplier/edit-supplier/edit-supplier.component';
+import { SgcComponent } from './routes/sgc/sgc.component';
 
 export const routes: Routes = [
   {
@@ -33,6 +34,10 @@ export const routes: Routes = [
         path: 'seller',
         component: SellerComponent,
         children: [
+          {
+            path: 'sgc',
+            component: SgcComponent,
+          },
           {
             path: 'report',
             component: ReportComponent,
